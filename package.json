@@ -1,0 +1,9 @@
+{
+  "name": "Assignment3",
+  "version": "0.0.1",
+  "description": "SENG 513 Assignment 3 Jeffrey Rude",
+  "dependencies": {
+    "express": "^4.15.2",
+    "socket.io": "^2.2.0"
+  }
+}
