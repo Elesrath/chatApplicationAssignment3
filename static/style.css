@@ -1,0 +1,104 @@
+html, body {
+    height: 99%;
+}
+
+p {
+    padding-left: 1%;
+}
+
+#wrapper {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+}
+
+#leftCol {
+    border: 1px solid black;
+    height: 100%;
+    width: 69%;
+    background: red;
+}
+
+#rightCol {
+    border: 1px solid black;
+    height: 100%;
+    width: 30%;
+    background: yellow;
+}
+
+#messageHist {
+    border: 1px solid black;
+    background: darkgray;
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+#onlineUsers {
+    border: 1px solid black;
+    background: #eeeeee;
+    height: 93%;
+    width: 97%;
+    margin: 0 auto;
+}
+
+#m {
+    border: 1px solid black;
+    background: lightgray;
+    width: 80%;
+    height: 1.5em;
+    margin: 1%;
+}
+
+#messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#messages li {
+    padding: 5px 10px;
+}
+
+#messages li:nth-child(odd) {
+    background: purple;
+}
+
+#submit {
+    height: 1.8em;
+    width: 15%;
+    margin: 1%;
+}
+
+.floatLeft {
+    float: left;
+}
+
+.floatRight {
+    float: right;
+}
+
+.box {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+
+.box .header {
+    flex: 0 1 auto;
+}
+
+.box .content {
+    flex: 1 1 auto;
+    background: green;
+    overflow-y: hidden;
+    padding: 1%;
+}
+
+.box .footer {
+    flex: 0 1 auto;
+}
