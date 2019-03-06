@@ -5,12 +5,66 @@ var io = require('socket.io')(http);
 
 
 //Variables
-let numUniqueUsers = 0;
-let connectedUsersNames = [];
-let connectedUserSockets = [];
+let connectedUsers = [];
 
+function compileUserList()
+{
+    let userList = [];
+    for(i = 0; i < connectedUsers.length; i++)
+    {
+        userList.push(connectedUsers[i].name);
+    }
+    return userList;
+}
 
+function addUser(name, sock)
+{
+    connectedUsers.push(
+        {"name": name,
+        "socket": sock,
+        "colour": {"r": 0x00, "g": 0x00, "b": 0x00}
+        });
+}
 
+function removeUser(sock)
+{
+    let index;
+    for(i = 0; i < connectedUsers.length; i++)
+    {
+        if(connectedUsers[i].socket === sock)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    console.log('[INFO] User disconnected: ' + connectedUsers[i].name);
+
+    connectedUsers.splice(index, 1);
+}
+
+function getUser(sock)
+{
+    for(i = 0; i < connectedUsers.length; i++)
+    {
+        if(connectedUsers[i].socket === sock)
+        {
+            return connectedUsers[i];
+        }
+    }
+}
+
+function checkUnique(n)
+{
+    for(i = 0; i < connectedUsers.length; i++)
+    {
+        if(connectedUsers[i].name === n)
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
 app.use(express.static('static'));
 
@@ -22,77 +76,89 @@ app.get('/', function(req, res)
 
 io.on('connection', function(socket)
 {
-    console.log('a user connected');
+    //console.log('a user connected');
 
     //New client asks for name
     socket.on('new client request name', function()
     {
         //Give the client a new name
-        let newName = "User" + numUniqueUsers++;
+        let newName = "User" + connectedUsers.length;
         socket.emit('give name', newName);
 
-        connectedUsersNames.push(newName);
-        connectedUserSockets.push(socket);
+        addUser(newName, socket);
 
         //Propagate new list of users to all clients
-        //io.emit('user connect', newName);
+        io.emit('user update', compileUserList());
 
 
-        console.log("New client given name " + newName);
+        console.log("[INFO] New client connected. Given name: " + newName);
     });
 
     //Returning client
     socket.on('returning client', function(msg)
     {
-        //TODO
         //Check to see if returning name is taken
         //Give the client the requested name if it is not taken.
         //Otherwise, give the client a new generic name
         let newName;
-        if(false)
-        {
-            //Name is taken. Give generic
-            newName = "User" + numUniqueUsers++;
-            socket.emit('give name', newName);
-            connectedUsersNames.push(newName);
-            connectedUserSockets.push(socket);
-        }
-        else
+        if(checkUnique(msg))
         {
             //Name is not taken
             newName = msg;
             socket.emit('give name', newName);
-            connectedUsersNames.push(newName);
-            connectedUserSockets.push(socket);
+            addUser(newName, socket);
+            console.log("[INFO] Returning user. Requested name " + newName + " not in use.");
+        }
+        else
+        {
+            //Name is taken. Give generic
+            newName = "User" + connectedUsers.length;
+            socket.emit('give name', newName);
+            addUser(newName, socket);
+            console.log("[INFO] Returning user. Requested name " + msg + " in use. Given name " + newName + ".");
         }
 
         //Propagate new list of users to all clients
-        //io.emit('user connect', msg);
-
-
-        console.log("Returning client with name " + newName);
+        io.emit('user update', compileUserList());
     });
 
     //Chat message
     socket.on('chat message', function(msg)
     {
-
-        io.emit('chat message', msg);
-        console.log('message: ' + msg);
+        usr = getUser(socket);
+        let message = {
+            "time": 0,
+            "username": usr.name,
+            "colour": usr.colour,
+            "content": msg,
+        };
+        console.log(message.toString());
+        console.log('[CHAT] Message: ' + msg);
     });
+
+    socket.on('name change', function(msg)
+    {
+        usr = getUser(socket);
+        if(checkUnique(msg))
+        {
+            console.log("[CHAT] User " + usr.name + " requested name change to " + msg + ". Granted.");
+            socket.emit('give name', msg);
+            usr.name = msg;
+            io.emit('user update', compileUserList());
+        }
+        else
+        {
+            console.log("[CHAT] User " + usr.name + " requested name change to " + msg + ". Rejected.");
+            socket.emit('name rejected', msg);
+        }
+    });
+
 
     //Disconnection
     socket.on('disconnect', function()
     {
-
-        let i = connectedUserSockets.indexOf(socket);
-
-        console.log('User disconnected: ' + connectedUsersNames[i]);
-
-
-
-        connectedUsersNames.splice(i, 1);
-        connectedUserSockets.splice(i, 1);
+        removeUser(socket);
+        io.emit('user update', compileUserList());
     });
 });
 

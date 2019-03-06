@@ -35,22 +35,27 @@
                 e.preventDefault();
                 let mes = $('#m');
                 let msg = mes.val();
-                if(msg.startsWith("/nick "))
+                if(msg !== "")
                 {
+                    if(msg.startsWith("/nick "))
+                    {
+                        socket.emit('name change', msg.substring(6));
+                    }
+                    else if(msg.startsWith("nickcolor "))
+                    {
 
-                }
-                else if(msg.startsWith("nickcolor "))
-                {
-
-                }
-                else
-                {
-                    socket.emit('chat message', msg);
+                    }
+                    else
+                    {
+                        socket.emit('chat message', msg);
+                    }
                 }
 
                 mes.val('');
                 return false;
             });
+
+            //Chat message recieved
             socket.on('chat message', function(msg)
             {
                 $('#messages').append($('<li>').text(msg));
@@ -64,12 +69,22 @@
                 document.cookie = "chatName=" + msg + ";max-age=" + 60;//*60*24;
             });
 
+            //Name change rejected
+            socket.on('name rejected', function(msg)
+            {
+                $('#messages').append($('<li>').text("The name " + msg + " was rejected. It is likely already in use."));
+            });
+
+            //The list of users has changed
+            //Caused by join, disconnect, and name change
             socket.on('user update', function (msg)
             {
-                alert("User connected: " + msg);
-                //TODO
-                //Replace instead of append
-                $('#onlineUsers').append($('<li class="userList">').text(msg));
+                let userList = $('#onlineUsers');
+                userList.empty();
+                for(i = 0; i < msg.length; i++)
+                {
+                    userList.append($('<li class="userList">').text(msg[i]));
+                }
             });
         });
     </script>
