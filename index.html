@@ -11,18 +11,65 @@
     <script>
         $(function()
         {
+            //Initial connection
             var socket = io();
+
+            //Get a name or give existing one
+            if(document.cookie.split(';').filter(function(item)
+            {
+                return item.trim().indexOf('chatName=') === 0
+            }).length)
+            {
+                let name = document.cookie.replace(/(?:(?:^|.*;\s*)chatName\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+                //alert("Cookie chatName exists with value: " + name);
+                socket.emit('returning client', name);
+            }
+            else
+            {
+                //alert("Requesting new name");
+                socket.emit('new client request name');
+            }
+
             $('form').submit(function(e)
             {
                 e.preventDefault();
                 let mes = $('#m');
-                socket.emit('chat message', mes.val());
+                let msg = mes.val();
+                if(msg.startsWith("/nick "))
+                {
+
+                }
+                else if(msg.startsWith("nickcolor "))
+                {
+
+                }
+                else
+                {
+                    socket.emit('chat message', msg);
+                }
+
                 mes.val('');
                 return false;
             });
             socket.on('chat message', function(msg)
             {
                 $('#messages').append($('<li>').text(msg));
+            });
+
+            //Name Assignment/Change
+            socket.on('give name', function(msg)
+            {
+                document.getElementById("username").innerText = msg;
+                $('#messages').append($('<li>').text("You are now " + msg));
+                document.cookie = "chatName=" + msg + ";max-age=" + 60;//*60*24;
+            });
+
+            socket.on('user update', function (msg)
+            {
+                alert("User connected: " + msg);
+                //TODO
+                //Replace instead of append
+                $('#onlineUsers').append($('<li class="userList">').text(msg));
             });
         });
     </script>
@@ -32,7 +79,7 @@
             <div id="leftCol" class="floatLeft">
                 <div class="box">
                     <div class="header">
-                        <p>You are <span id="username">BLANK</span></p>
+                        <p>You are <span id="username"></span></p>
                     </div>
                     <div class="content">
                         <div id="messageHist">
@@ -48,9 +95,15 @@
                 </div>
             </div>
             <div id="rightCol" class="floatRight">
-                <p>Online users:</p>
-                <div id="onlineUsers">
-                    <ul id="users"></ul>
+                <div class="box">
+                    <div class="header">
+                        <p>Online users:</p>
+                    </div>
+                    <div class="content">
+                        <div id="onlineUsers">
+                            <ul id="users"></ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

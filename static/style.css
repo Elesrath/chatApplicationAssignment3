@@ -16,19 +16,19 @@ p {
     border: 1px solid black;
     height: 100%;
     width: 69%;
-    background: red;
+    background: lightgray;
 }
 
 #rightCol {
     border: 1px solid black;
     height: 100%;
     width: 30%;
-    background: yellow;
+    background: lightgray;
 }
 
 #messageHist {
     border: 1px solid black;
-    background: darkgray;
+    background: #f7f7f7;
     height: 100%;
     width: 100%;
 
@@ -40,15 +40,19 @@ p {
 
 #onlineUsers {
     border: 1px solid black;
-    background: #eeeeee;
-    height: 93%;
-    width: 97%;
-    margin: 0 auto;
+    background: #f7f7f7;
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    overflow-y: auto;
 }
 
 #m {
     border: 1px solid black;
-    background: lightgray;
+    background: #f7f7f7;
     width: 80%;
     height: 1.5em;
     margin: 1%;
@@ -65,7 +69,7 @@ p {
 }
 
 #messages li:nth-child(odd) {
-    background: purple;
+    background: #ffffff;
 }
 
 #submit {
@@ -94,9 +98,8 @@ p {
 
 .box .content {
     flex: 1 1 auto;
-    background: green;
     overflow-y: hidden;
-    padding: 1%;
+    padding: 5px;
 }
 
 .box .footer {
