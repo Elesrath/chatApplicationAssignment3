@@ -22,7 +22,7 @@ function addUser(name, sock)
     connectedUsers.push(
         {"name": name,
         "socket": sock,
-        "colour": {"r": 0x00, "g": 0x00, "b": 0x00}
+        "colour": {"r": 0xab, "g": 0xcd, "b": 0xef}
         });
 }
 
@@ -125,15 +125,17 @@ io.on('connection', function(socket)
     //Chat message
     socket.on('chat message', function(msg)
     {
+        let d = new Date();
         usr = getUser(socket);
         let message = {
-            "time": 0,
+            "time": d.getHours() + ":" + d.getMinutes(),
             "username": usr.name,
             "colour": usr.colour,
             "content": msg,
         };
-        console.log(message.toString());
-        console.log('[CHAT] Message: ' + msg);
+        console.log(message);
+        console.log('[CHAT] ' + message.time + ' ' + message.username + ': ' + msg);
+        io.emit('chat message', message);
     });
 
     socket.on('name change', function(msg)
@@ -141,14 +143,14 @@ io.on('connection', function(socket)
         usr = getUser(socket);
         if(checkUnique(msg))
         {
-            console.log("[CHAT] User " + usr.name + " requested name change to " + msg + ". Granted.");
+            console.log("[INFO] User " + usr.name + " requested name change to " + msg + ". Granted.");
             socket.emit('give name', msg);
             usr.name = msg;
             io.emit('user update', compileUserList());
         }
         else
         {
-            console.log("[CHAT] User " + usr.name + " requested name change to " + msg + ". Rejected.");
+            console.log("[INFO] User " + usr.name + " requested name change to " + msg + ". Rejected.");
             socket.emit('name rejected', msg);
         }
     });

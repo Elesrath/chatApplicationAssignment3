@@ -9,6 +9,8 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
+        test = 0;
+
         $(function()
         {
             //Initial connection
@@ -55,10 +57,20 @@
                 return false;
             });
 
-            //Chat message recieved
+            //Chat message received
             socket.on('chat message', function(msg)
             {
-                $('#messages').append($('<li>').text(msg));
+                let messageList = $('#messages');
+                let col = msg.colour.r.toString(16).padStart(2, '0') + msg.colour.g.toString(16).padStart(2, '0') + msg.colour.b.toString(16).padStart(2, '0');
+
+                if(msg.username === document.getElementById("username").innerText)
+                {
+                    messageList.append($('<li class="currentUser">').html(msg.time + " <span style='color: #" + col + "'>" + msg.username + "</span>: " + msg.content));
+                }
+                else
+                {
+                    messageList.append($('<li>').html(msg.time + " <span style='color: #" + col + "'>" + msg.username + "</span>: " + msg.content));
+                }
             });
 
             //Name Assignment/Change

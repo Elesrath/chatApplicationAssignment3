@@ -105,3 +105,7 @@ p {
 .box .footer {
     flex: 0 1 auto;
 }
+
+.currentUser {
+    font-weight: bold;
+}
