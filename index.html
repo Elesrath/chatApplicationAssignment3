@@ -43,9 +43,19 @@
                     {
                         socket.emit('name change', msg.substring(6));
                     }
-                    else if(msg.startsWith("nickcolor "))
+                    else if(msg.startsWith("/nickcolor "))
                     {
-
+                        let newColour = msg.substring(11);
+                        let checkForHex = /[0-9A-Fa-f]{6}/;
+                        if(newColour.length !== 6 || !checkForHex.test(newColour))
+                        {
+                            $('#messages').append($('<li>').text("Invalid colour. Format: RRGGBB"));
+                        }
+                        else
+                        {
+                            socket.emit('colour change', msg.substring(11));
+                            $('#messages').append($('<li>').text("Your colour has been updated"));
+                        }
                     }
                     else
                     {
@@ -62,7 +72,6 @@
             {
                 let messageList = $('#messages');
                 let col = msg.colour.r.toString(16).padStart(2, '0') + msg.colour.g.toString(16).padStart(2, '0') + msg.colour.b.toString(16).padStart(2, '0');
-
                 if(msg.username === document.getElementById("username").innerText)
                 {
                     messageList.append($('<li class="currentUser">').html(msg.time + " <span style='color: #" + col + "'>" + msg.username + "</span>: " + msg.content));

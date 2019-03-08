@@ -22,7 +22,7 @@ function addUser(name, sock)
     connectedUsers.push(
         {"name": name,
         "socket": sock,
-        "colour": {"r": 0xab, "g": 0xcd, "b": 0xef}
+        "colour": {"r": 0x00, "g": 0x00, "b": 0x00}
         });
 }
 
@@ -133,14 +133,13 @@ io.on('connection', function(socket)
             "colour": usr.colour,
             "content": msg,
         };
-        console.log(message);
         console.log('[CHAT] ' + message.time + ' ' + message.username + ': ' + msg);
         io.emit('chat message', message);
     });
 
     socket.on('name change', function(msg)
     {
-        usr = getUser(socket);
+        let usr = getUser(socket);
         if(checkUnique(msg))
         {
             console.log("[INFO] User " + usr.name + " requested name change to " + msg + ". Granted.");
@@ -155,6 +154,15 @@ io.on('connection', function(socket)
         }
     });
 
+    socket.on('colour change', function(msg)
+    {
+        let usr = getUser(socket);
+        let message = msg.toLowerCase();
+        console.log('[INFO] User ' + usr.name + ' requested colour change to ' + message);
+        usr.colour.r = parseInt(message.substring(0,2), 16);
+        usr.colour.g = parseInt(message.substring(2,4), 16);
+        usr.colour.b = parseInt(message.substring(4,6), 16);
+    });
 
     //Disconnection
     socket.on('disconnect', function()
