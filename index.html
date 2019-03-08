@@ -82,6 +82,23 @@
                 }
             });
 
+            socket.on('chat history', function(msg)
+            {
+                for(i = 0; i < msg.length; i++)
+                {
+                    let messageList = $('#messages');
+                    let col = msg[i].colour.r.toString(16).padStart(2, '0') + msg[i].colour.g.toString(16).padStart(2, '0') + msg[i].colour.b.toString(16).padStart(2, '0');
+                    if(msg[i].username === document.getElementById("username").innerText)
+                    {
+                        messageList.append($('<li class="currentUser">').html(msg[i].time + " <span style='color: #" + col + "'>" + msg[i].username + "</span>: " + msg[i].content));
+                    }
+                    else
+                    {
+                        messageList.append($('<li>').html(msg[i].time + " <span style='color: #" + col + "'>" + msg[i].username + "</span>: " + msg[i].content));
+                    }
+                }
+            });
+
             //Name Assignment/Change
             socket.on('give name', function(msg)
             {

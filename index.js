@@ -6,6 +6,7 @@ var io = require('socket.io')(http);
 
 //Variables
 let connectedUsers = [];
+let messageHistory = [];
 
 function compileUserList()
 {
@@ -90,6 +91,7 @@ io.on('connection', function(socket)
         //Propagate new list of users to all clients
         io.emit('user update', compileUserList());
 
+        socket.emit('chat history', messageHistory);
 
         console.log("[INFO] New client connected. Given name: " + newName);
     });
@@ -118,6 +120,8 @@ io.on('connection', function(socket)
             console.log("[INFO] Returning user. Requested name " + msg + " in use. Given name " + newName + ".");
         }
 
+        socket.emit('chat history', messageHistory);
+
         //Propagate new list of users to all clients
         io.emit('user update', compileUserList());
     });
@@ -133,6 +137,13 @@ io.on('connection', function(socket)
             "colour": usr.colour,
             "content": msg,
         };
+
+        messageHistory.push(message);
+        if(messageHistory.length > 200)
+        {
+            messageHistory = messageHistory.slice(1);
+        }
+
         console.log('[CHAT] ' + message.time + ' ' + message.username + ': ' + msg);
         io.emit('chat message', message);
     });
