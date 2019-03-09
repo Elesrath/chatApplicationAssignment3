@@ -35,7 +35,7 @@ p {
     display: flex;
     justify-content: flex-end;
     flex-direction: column;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 #onlineUsers {
@@ -62,6 +62,7 @@ p {
     list-style-type: none;
     margin: 0;
     padding: 0;
+    overflow-y: scroll;
 }
 
 #messages li {

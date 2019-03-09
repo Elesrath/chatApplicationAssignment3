@@ -7,6 +7,17 @@ var io = require('socket.io')(http);
 //Variables
 let connectedUsers = [];
 let messageHistory = [];
+let counter = 0;
+
+function pad(num, size)
+{
+    let s = num + "";
+    while(s.length < size)
+    {
+        s = "0" + s;
+    }
+    return s;
+}
 
 function compileUserList()
 {
@@ -83,7 +94,7 @@ io.on('connection', function(socket)
     socket.on('new client request name', function()
     {
         //Give the client a new name
-        let newName = "User" + connectedUsers.length;
+        let newName = "User" + counter++;
         socket.emit('give name', newName);
 
         addUser(newName, socket);
@@ -91,13 +102,14 @@ io.on('connection', function(socket)
         //Propagate new list of users to all clients
         io.emit('user update', compileUserList());
 
+        //Propagate old chat to new user
         socket.emit('chat history', messageHistory);
 
         console.log("[INFO] New client connected. Given name: " + newName);
     });
 
     //Returning client
-    socket.on('returning client', function(msg)
+    socket.on('returning client', function(msg, col)
     {
         //Check to see if returning name is taken
         //Give the client the requested name if it is not taken.
@@ -109,17 +121,22 @@ io.on('connection', function(socket)
             newName = msg;
             socket.emit('give name', newName);
             addUser(newName, socket);
+            let usr = getUser(socket);
+            usr.colour.r = parseInt(col.substring(0,2), 16);
+            usr.colour.g = parseInt(col.substring(2,4), 16);
+            usr.colour.b = parseInt(col.substring(4,6), 16);
             console.log("[INFO] Returning user. Requested name " + newName + " not in use.");
         }
         else
         {
             //Name is taken. Give generic
-            newName = "User" + connectedUsers.length;
+            newName = "User" + counter++;
             socket.emit('give name', newName);
             addUser(newName, socket);
             console.log("[INFO] Returning user. Requested name " + msg + " in use. Given name " + newName + ".");
         }
 
+        //Propagate old chat to new user
         socket.emit('chat history', messageHistory);
 
         //Propagate new list of users to all clients
@@ -130,11 +147,15 @@ io.on('connection', function(socket)
     socket.on('chat message', function(msg)
     {
         let d = new Date();
-        usr = getUser(socket);
+        let usr = getUser(socket);
         let message = {
-            "time": d.getHours() + ":" + d.getMinutes(),
+            "time": pad(d.getHours(), 2) + ":" + pad(d.getMinutes(), 2),
             "username": usr.name,
-            "colour": usr.colour,
+            "colour": {
+                "r": usr.colour.r,
+                "g": usr.colour.g,
+                "b": usr.colour.b
+            },
             "content": msg,
         };
 

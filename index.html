@@ -9,7 +9,23 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-        test = 0;
+        let colour = "000000";
+        window.onbeforeunload = function()
+        {
+            let name = document.getElementById("username").innerText;
+            document.cookie = "chatName=" + colour + name + ";max-age=" + 60;//*60*24;
+            return null;
+        };
+
+        function pad(num, size)
+        {
+            let s = num + "";
+            while(s.length < size)
+            {
+                s = "0" + s;
+            }
+            return s;
+        }
 
         $(function()
         {
@@ -22,9 +38,9 @@
                 return item.trim().indexOf('chatName=') === 0
             }).length)
             {
-                let name = document.cookie.replace(/(?:(?:^|.*;\s*)chatName\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+                let cookieContent = document.cookie.replace(/(?:(?:^|.*;\s*)chatName\s*\=\s*([^;]*).*$)|^.*$/, "$1");
                 //alert("Cookie chatName exists with value: " + name);
-                socket.emit('returning client', name);
+                socket.emit('returning client', cookieContent.substring(6), cookieContent.substring(0, 6));
             }
             else
             {
@@ -53,7 +69,8 @@
                         }
                         else
                         {
-                            socket.emit('colour change', msg.substring(11));
+                            colour = newColour;
+                            socket.emit('colour change', newColour);
                             $('#messages').append($('<li>').text("Your colour has been updated"));
                         }
                     }
@@ -80,6 +97,8 @@
                 {
                     messageList.append($('<li>').html(msg.time + " <span style='color: #" + col + "'>" + msg.username + "</span>: " + msg.content));
                 }
+                let ml = document.getElementById("messages");
+                ml.scrollTop = ml.scrollHeight;
             });
 
             socket.on('chat history', function(msg)
@@ -104,7 +123,7 @@
             {
                 document.getElementById("username").innerText = msg;
                 $('#messages').append($('<li>').text("You are now " + msg));
-                document.cookie = "chatName=" + msg + ";max-age=" + 60;//*60*24;
+                //document.cookie = "chatName=" + msg + ";max-age=" + 60;//*60*24;
             });
 
             //Name change rejected
