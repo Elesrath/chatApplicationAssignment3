@@ -146,6 +146,11 @@
                     userList.append($('<li class="userList">').text(msg[i]));
                 }
             });
+
+            socket.on('colour', function(msg)
+            {
+                colour = msg;
+            });
         });
     </script>
 

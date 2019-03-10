@@ -126,6 +126,7 @@ io.on('connection', function(socket)
             usr.colour.g = parseInt(col.substring(2,4), 16);
             usr.colour.b = parseInt(col.substring(4,6), 16);
             console.log("[INFO] Returning user. Requested name " + newName + " not in use.");
+            socket.emit('colour', col);
         }
         else
         {
