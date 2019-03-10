@@ -116,6 +116,9 @@
                         messageList.append($('<li>').html(msg[i].time + " <span style='color: #" + col + "'>" + msg[i].username + "</span>: " + msg[i].content));
                     }
                 }
+
+                let ml = document.getElementById("messages");
+                ml.scrollTop = ml.scrollHeight;
             });
 
             //Name Assignment/Change
